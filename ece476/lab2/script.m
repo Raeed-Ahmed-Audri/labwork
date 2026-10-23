@@ -1,10 +1,10 @@
 %% Calculate TE101 and TE102 Modes using theoretical Eqns.
 %Waveguide Numbers (test for now)
-a = 0.04; 
-b = 0.02;
-d = 0.05;
+a = 22.86e-3;                           % WR-90 broad wall
+b = 10.16e-3
+d = 27.3*10^-3;
 c = 3*10^8;
-cond = 2.564*10^7;
+cond = 2.564*10^-7;
 permeability_free_space = 4*pi*10^-7;
 permittivity_free_space = 8.85418782 * 10^-12;
 
@@ -27,13 +27,13 @@ Q102 = (k102*a*d)^3*b*eta/(2*pi^2*Rs102)*(1/(2*2^2*a^3*b + 2*b*d^3 + 2^2*a^3*d +
 
 %% Measure and plot the return loss around the resonant frequency of the dominant mode
 clc; close all; 
-S1 = load('test1.s2p');                 % one-port cavity measurement
+S1 = load('port 1.s2p');                 % one-port cavity measurement
 freq = S1(:,1);                         % Hz
 S11_db = S1(:,2);                       % dB
 
 a = 22.86e-3;                           % WR-90 broad wall
 b = 10.16e-3;
-d = 50e-3;                            
+d = 27.3*10^-3;
 c = 3e8;
 
 f101 = (c/2)*sqrt((1/a)^2 + (1/d)^2);   % TE101 resonant frequency, Hz
@@ -52,13 +52,13 @@ title('TE101 one-port resonance')
 
 %% Measure f0 and find the loaded Q
 clc; close all; 
-S1 = load('test1.s2p');                
+S1 = load('port 1.s2p');                
 freq = S1(:,1);                         
 S11_db = S1(:,2);                       
 
 a = 22.86e-3;                           
 b = 10.16e-3;
-d = 50e-3;                            
+d = 27.3*10^-3;
 c = 3e8;
 
 f101 = (c/2)*sqrt((1/a)^2 + (1/d)^2);   
