@@ -1,10 +1,10 @@
 %% Calculate TE101 and TE102 Modes using theoretical Eqns.
 %Waveguide Numbers (test for now)
-a = 22.86e-3;                           % WR-90 broad wall
-b = 10.16e-3
-d = 27.3*10^-3;
+a = 23e-3;                           % WR-90 broad wall
+b = 10.2e-3;
+d = 28.2*10^-3;
 c = 3*10^8;
-cond = 2.564*10^-7;
+cond = 2.564*10^7;
 permeability_free_space = 4*pi*10^-7;
 permittivity_free_space = 8.85418782 * 10^-12;
 
@@ -17,11 +17,11 @@ fc102 = c/(2*pi)*sqrt((pi/a)^2+(0*pi/b)^2+(2*pi/d)^2);
 k101 = sqrt((pi/a)^2+(0*pi/b)^2+(pi/d)^2);
 k102 = sqrt((pi/a)^2+(0*pi/b)^2+(2*pi/d)^2);
 
-Rs101 = sqrt((2*pi*fc101*4*pi*10^-7)/(2*cond));
-Rs102 = sqrt((2*pi*fc102*4*pi*10^-7)/(2*cond));
+Rs101 = sqrt(2*pi*fc101*permeability_free_space/(2*cond));
+Rs102 = sqrt(2*pi*fc102*permeability_free_space/(2*cond));
 
-Q101 = (k101*a*d)^3*b*eta/(2*pi^2*Rs101)*(1/(2*1^2*a^3*b + 2*b*d^3 + 1^2*a^3*d + a*d^3))
-Q102 = (k102*a*d)^3*b*eta/(2*pi^2*Rs102)*(1/(2*2^2*a^3*b + 2*b*d^3 + 2^2*a^3*d + a*d^3))
+Q101 = (k101*a*d)^3*b*eta/(2*pi^2*Rs101)*(1/(2*1^2*a^3*b + 2*b*d^3 + 1^2*a^3*d + a*d^3));
+Q102 = (k102*a*d)^3*b*eta/(2*pi^2*Rs102)*(1/(2*2^2*a^3*b + 2*b*d^3 + 2^2*a^3*d + a*d^3));
 
 
 
@@ -31,9 +31,9 @@ S1 = load('port 1.s2p');                 % one-port cavity measurement
 freq = S1(:,1);                         % Hz
 S11_db = S1(:,2);                       % dB
 
-a = 22.86e-3;                           % WR-90 broad wall
-b = 10.16e-3;
-d = 27.3*10^-3;
+a = 23e-3;                           % WR-90 broad wall
+b = 10.2e-3;
+d = 28.2*10^-3;
 c = 3e8;
 
 f101 = (c/2)*sqrt((1/a)^2 + (1/d)^2);   % TE101 resonant frequency, Hz
@@ -56,9 +56,9 @@ S1 = load('port 1.s2p');
 freq = S1(:,1);                         
 S11_db = S1(:,2);                       
 
-a = 22.86e-3;                           
-b = 10.16e-3;
-d = 27.3*10^-3;
+a = 23e-3;                           % WR-90 broad wall
+b = 10.2e-3;
+d = 28.2*10^-3;
 c = 3e8;
 
 f101 = (c/2)*sqrt((1/a)^2 + (1/d)^2);   
@@ -98,3 +98,19 @@ fprintf('f0: measured = %.4f GHz, theory = %.4f GHz, error = %+.2f %%\n', ...
 fprintf('QL = %.0f, K = %.3f, QU = %.0f\n', QL, K, QU);
 fprintf('QU: measured = %.0f, theory = %.0f, error = %+.1f %%\n', ...
         QU, Q101, (QU - Q101)/Q101*100);
+
+%% Coupling check: S11 in the complex plane (delay removed)
+S11c = 10.^(S1(:,2)/20) .* exp(1j*S1(:,3)*pi/180);
+w  = (freq >= f0 - 60e6) & (freq <= f0 + 60e6);
+fw = freq(w);  s = S11c(w);
+ph = unwrap(angle(s));
+e  = [1:30, numel(fw)-29:numel(fw)];            % off-resonance edges
+p  = polyfit(fw(e), ph(e), 1);                   % linear phase delay
+sc = s .* exp(-1j*polyval(p, fw));               % delay removed
+
+figure; plot(real(sc), imag(sc)); hold on; axis equal; grid on
+plot(real(sc(fw == f0)), imag(sc(fw == f0)), 'ro', 'MarkerFaceColor', 'r');
+plot(0, 0, 'k+', 'MarkerSize', 12);
+th = linspace(0, 2*pi, 200); plot(cos(th), sin(th), 'k:');   % |Gamma| = 1
+xlabel('Re\{\Gamma\}'); ylabel('Im\{\Gamma\}');
+title('One-port S_{11} near resonance (line delay removed)');
