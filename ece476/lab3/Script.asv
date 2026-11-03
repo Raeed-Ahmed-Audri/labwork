@@ -1,0 +1,45 @@
+%Angles
+angles = [-90:10:90];
+CoPolar_E = [1:1:19];% List numbers as we go on
+CoPolar_H = [];
+CrossPolar_E = [1:2.5:48];
+CrossPolar_H = [];
+
+%Finding the Zero degree index
+angle = 0;
+ref_angle_position = find(ismember(angles,angle));
+
+%Normalization
+CoPolar_E_norm = CoPolar_E - CoPolar_E(ref_angle_position);
+% CoPolar_H_norm = CoPolar_H - CoPolar_H(ref_angle_position);
+CrossPolar_E_norm = CrossPolar_E - CoPolar_E(ref_angle_position);
+% CrossPolar_H_norm = CrossPolar_H - CoPolar_H(ref_angle_position);
+
+%Converting to linear (mW)
+P_CoPolar_E  = 10.^(CoPolar_E_norm/10);
+% P_CoPolar_H  = 10.^(CoPolar_H_norm/10);
+% P_CrossPolar_E  = 10.^(CrossPolar_E_norm/10);
+% P_CrossPolar_H  = 10.^(CrossPolar_H_norm/10);
+
+%Cartesian Plot
+plot(angles,CoPolar_E_norm,...
+    angles, CrossPolar_E_norm, "linewidth", 1.5);
+grid on
+set(gca, 'FontSize', 11, 'FontName', "Times")
+xlabel('$\mathrm{Degrees}\ (^\circ)$', 'Interpreter', 'latex')
+ylabel('$dBm$', "Interpreter", "latex")
+lgd = legend({'$\mathrm{Co\mbox{-}Polar\ E\mbox{-}Plane\ Normalized}$', ...
+              '$\mathrm{Cross\mbox{-}Polar\ E\mbox{-}Plane\ Normalized}$'});
+lgd.Interpreter = 'latex';
+
+%print('E_plot.jpg', '-djpeg', '-r300')
+figure
+plot(angles,CoPolar_H_norm,...
+    angles, CrossPolar_H_norm, "linewidth", 1.5);
+grid on
+set(gca, 'FontSize', 11, 'FontName', "Times")
+xlabel('$\mathrm{Degrees}\ (^\circ)$', 'Interpreter', 'latex')
+ylabel('$dBm$', "Interpreter", "latex")
+lgd = legend({'$\mathrm{Co\mbox{-}Polar\ E\mbox{-}Plane\ Normalized}$', ...
+              '$\mathrm{Cross\mbox{-}Polar\ E\mbox{-}Plane\ Normalized}$'});
+lgd.Interpreter = 'latex';
